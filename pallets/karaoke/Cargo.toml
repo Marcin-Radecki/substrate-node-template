@@ -1,5 +1,5 @@
 [package]
-name = 'pallet-template'
+name = 'pallet-karaoke'
 version = '4.0.0-dev'
 description = 'FRAME pallet template for defining custom runtime logic.'
 authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
@@ -8,6 +8,9 @@ edition = '2021'
 license = 'Unlicense'
 publish = false
 repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+
+[dependencies]
+log = "0.4.14"
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
@@ -54,7 +57,19 @@ git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-12'
 version = '4.0.0-dev'
 
-[dev-dependencies.sp-runtime]
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-12'
+version = '4.0.0-dev'
+
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-12'
+version = '4.0.0-dev'
+
+[dependencies.sp-inherents]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-12'
@@ -69,5 +84,7 @@ std = [
     'frame-support/std',
     'frame-system/std',
     'frame-benchmarking/std',
+    'sp-std/std',
+    'sp-runtime/std',
 ]
 try-runtime = ['frame-support/try-runtime']

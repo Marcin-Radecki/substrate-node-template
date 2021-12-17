@@ -28,6 +28,8 @@ version = '4.0.0-dev'
 [dependencies]
 jsonrpc-core = '18.0.0'
 structopt = '0.3.8'
+futures = "0.3.9"
+log = "0.4.14"
 
 [dependencies.frame-benchmarking]
 git = 'https://github.com/paritytech/substrate.git'
@@ -127,6 +129,17 @@ git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-12'
 version = '4.0.0-dev'
 
+[dependencies.sc-block-builder]
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-12'
+version = '0.10.0-dev'
+
+[dependencies.sp-inherents]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-12'
+version = '4.0.0-dev'
+
 [dependencies.sp-blockchain]
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-12'
@@ -166,6 +179,8 @@ version = '4.0.0-dev'
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-12'
 version = '4.0.0-dev'
+
+
 
 [features]
 default = []

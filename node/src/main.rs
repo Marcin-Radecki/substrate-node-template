@@ -7,6 +7,7 @@ mod service;
 mod cli;
 mod command;
 mod rpc;
+mod karaoke_proposer_factory;
 
 fn main() -> sc_cli::Result<()> {
 	command::run()
