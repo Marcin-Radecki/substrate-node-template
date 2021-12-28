@@ -11,7 +11,7 @@ use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_consensus::SlotData;
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use std::{sync::Arc, time::Duration};
-use crate::karaoke_proposer_factory::KaraokeProposerFactory;
+use crate::karaoke_inherent_provider::KaraokeInherentDataProvider;
 
 // Our native executor instance.
 pub struct ExecutorDispatch;
@@ -241,13 +241,13 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
 	})?;
 
 	if role.is_authority() {
-		let proposer_factory = KaraokeProposerFactory(sc_basic_authorship::ProposerFactory::new(
+		let proposer_factory = sc_basic_authorship::ProposerFactory::new(
 			task_manager.spawn_handle(),
 			client.clone(),
 			transaction_pool,
 			prometheus_registry.as_ref(),
 			telemetry.as_ref().map(|x| x.handle()),
-		));
+		);
 
 		let can_author_with =
 			sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
@@ -271,7 +271,9 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
 							raw_slot_duration,
 						);
 
-					Ok((timestamp, slot))
+					let karaoke_inherent_provider = KaraokeInherentDataProvider{};
+
+					Ok((timestamp, slot, karaoke_inherent_provider))
 				},
 				force_authoring,
 				backoff_authoring_blocks,

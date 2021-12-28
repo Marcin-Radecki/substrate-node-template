@@ -1,0 +1,85 @@
+marcin@marcin-Latitude-3520:~/playground/substrate-node-template-fork$ ./target/release/node-template --dev
+2021-12-29 10:20:33 Running in --dev mode, RPC CORS has been disabled.    
+2021-12-29 10:20:33 Substrate Node    
+2021-12-29 10:20:33 ✌️  version 4.0.0-dev-01e94b9-x86_64-linux-gnu    
+2021-12-29 10:20:33 ❤️  by Substrate DevHub <https://github.com/substrate-developer-hub>, 2017-2021    
+2021-12-29 10:20:33 📋 Chain specification: Development    
+2021-12-29 10:20:33 🏷 Node name: ashamed-request-8930    
+2021-12-29 10:20:33 👤 Role: AUTHORITY    
+2021-12-29 10:20:33 💾 Database: RocksDb at /tmp/substrategs2EzE/chains/dev/db/full    
+2021-12-29 10:20:33 ⛓  Native runtime: node-template-100 (node-template-1.tx1.au1)    
+2021-12-29 10:20:33 🔨 Initializing Genesis block/state (state: 0x0d30…4fb2, header-hash: 0xb047…97b6)    
+2021-12-29 10:20:33 👴 Loading GRANDPA authority set from genesis on what appears to be first startup.    
+2021-12-29 10:20:33 ⏱  Loaded block-time = 6s from block 0xb04723551644188b05fe0c3560f547d943a2000cf6274525cfc3a85932fd97b6    
+2021-12-29 10:20:33 Using default protocol ID "sup" because none is configured in the chain specs    
+2021-12-29 10:20:33 🏷 Local node identity is: 12D3KooWJZQEiKMJN1f7Q2DZc9YU3nHxkwjfTD3epJMDzH1L5cpa    
+2021-12-29 10:20:33 📦 Highest known block at #0    
+2021-12-29 10:20:33 〽️ Prometheus exporter started at 127.0.0.1:9615    
+2021-12-29 10:20:33 Listening for new connections on 127.0.0.1:9944.    
+2021-12-29 10:20:36 🎤 Proposing song lyric to a block.    
+2021-12-29 10:20:36 🙌 Starting consensus session on top of parent 0xb04723551644188b05fe0c3560f547d943a2000cf6274525cfc3a85932fd97b6    
+2021-12-29 10:20:36 🎤 Storing song verse in storage: Life, it seems, will fade away    
+2021-12-29 10:20:36 🎁 Prepared block for proposing at 1 (1 ms) [hash: 0x8f1435447e697f863865621f2e22cc75c4277fad403cde61d53a25f2c63b32ba; parent_hash: 0xb047…97b6; extrinsics (2): [0xc8e9…c06f, 0xd305…042b]]    
+2021-12-29 10:20:36 🔖 Pre-sealed block for proposal at 1. Hash now 0x9a531ceca309a3b39bc5f4b8618372255467cb68fd48fbfff7699251f9e45bc7, previously 0x8f1435447e697f863865621f2e22cc75c4277fad403cde61d53a25f2c63b32ba.    
+2021-12-29 10:20:36 ✨ Imported #1 (0x9a53…5bc7)    
+2021-12-29 10:20:38 💤 Idle (0 peers), best: #1 (0x9a53…5bc7), finalized #0 (0xb047…97b6), ⬇ 0 ⬆ 0    
+2021-12-29 10:20:42 🎤 Proposing song lyric to a block.    
+2021-12-29 10:20:42 🙌 Starting consensus session on top of parent 0x9a531ceca309a3b39bc5f4b8618372255467cb68fd48fbfff7699251f9e45bc7    
+2021-12-29 10:20:42 🎤 Storing song verse in storage: Drifting further, every day    
+2021-12-29 10:20:42 🎁 Prepared block for proposing at 2 (0 ms) [hash: 0x900b3525a9f98a4da28001581897a03dba3be528023bc151e87e43811e67d926; parent_hash: 0x9a53…5bc7; extrinsics (2): [0x3237…0d89, 0xa222…0cf9]]    
+2021-12-29 10:20:42 🔖 Pre-sealed block for proposal at 2. Hash now 0xaef9d56c944c78987e7112a9111d063d4320604429ffc323511e65c0c44b42fd, previously 0x900b3525a9f98a4da28001581897a03dba3be528023bc151e87e43811e67d926.    
+2021-12-29 10:20:42 ✨ Imported #2 (0xaef9…42fd)    
+2021-12-29 10:20:43 💤 Idle (0 peers), best: #2 (0xaef9…42fd), finalized #0 (0xb047…97b6), ⬇ 0 ⬆ 0    
+2021-12-29 10:20:48 🎤 Proposing song lyric to a block.    
+2021-12-29 10:20:48 🙌 Starting consensus session on top of parent 0xaef9d56c944c78987e7112a9111d063d4320604429ffc323511e65c0c44b42fd    
+2021-12-29 10:20:48 🎤 Storing song verse in storage: Getting lost within myself    
+2021-12-29 10:20:48 🎁 Prepared block for proposing at 3 (0 ms) [hash: 0x32a9b5b5463592151f32cbb2acbf21e8f4c2214224be35d0086eda789c66a60a; parent_hash: 0xaef9…42fd; extrinsics (2): [0xbfea…5975, 0x4515…cc69]]    
+2021-12-29 10:20:48 🔖 Pre-sealed block for proposal at 3. Hash now 0xd44f4f9f815ff40bdb6a0b60a44d6b04eb6f109aec1dbe9a922e92ad016ee49e, previously 0x32a9b5b5463592151f32cbb2acbf21e8f4c2214224be35d0086eda789c66a60a.    
+2021-12-29 10:20:48 ✨ Imported #3 (0xd44f…e49e)    
+2021-12-29 10:20:48 💤 Idle (0 peers), best: #3 (0xd44f…e49e), finalized #1 (0x9a53…5bc7), ⬇ 0 ⬆ 0    
+2021-12-29 10:20:53 💤 Idle (0 peers), best: #3 (0xd44f…e49e), finalized #1 (0x9a53…5bc7), ⬇ 0 ⬆ 0    
+2021-12-29 10:20:54 🎤 Proposing song lyric to a block.    
+2021-12-29 10:20:54 🙌 Starting consensus session on top of parent 0xd44f4f9f815ff40bdb6a0b60a44d6b04eb6f109aec1dbe9a922e92ad016ee49e    
+2021-12-29 10:20:54 🎤 Storing song verse in storage: Nothing matters, no one else    
+2021-12-29 10:20:54 🎁 Prepared block for proposing at 4 (0 ms) [hash: 0x6a1634f5b06869b1ea2c12adcb7d42ffc601da410d78c8b8a7f9d65c47e99e45; parent_hash: 0xd44f…e49e; extrinsics (2): [0x13f0…3704, 0x9b96…d929]]    
+2021-12-29 10:20:54 🔖 Pre-sealed block for proposal at 4. Hash now 0xa079f783c409912fb7a9930c0d351166d4ab3aa7c0d4163c70684dce6baa029b, previously 0x6a1634f5b06869b1ea2c12adcb7d42ffc601da410d78c8b8a7f9d65c47e99e45.    
+2021-12-29 10:20:54 ✨ Imported #4 (0xa079…029b)    
+2021-12-29 10:20:58 💤 Idle (0 peers), best: #4 (0xa079…029b), finalized #2 (0xaef9…42fd), ⬇ 0 ⬆ 0    
+2021-12-29 10:21:00 🎤 Proposing song lyric to a block.    
+2021-12-29 10:21:00 🙌 Starting consensus session on top of parent 0xa079f783c409912fb7a9930c0d351166d4ab3aa7c0d4163c70684dce6baa029b    
+2021-12-29 10:21:00 🎤 Storing song verse in storage: I have lost the will to live    
+2021-12-29 10:21:00 🎁 Prepared block for proposing at 5 (0 ms) [hash: 0x6a03f628c9e92cc0399a4104559548882ee442cbe323dacdfca5b346de2cef87; parent_hash: 0xa079…029b; extrinsics (2): [0x9a91…5734, 0x76a0…ddaf]]    
+2021-12-29 10:21:00 🔖 Pre-sealed block for proposal at 5. Hash now 0x3038681a906e24c5070c4763027cacbd2438388d89378898ef07632db99ac79a, previously 0x6a03f628c9e92cc0399a4104559548882ee442cbe323dacdfca5b346de2cef87.    
+2021-12-29 10:21:00 ✨ Imported #5 (0x3038…c79a)    
+2021-12-29 10:21:03 💤 Idle (0 peers), best: #5 (0x3038…c79a), finalized #3 (0xd44f…e49e), ⬇ 0 ⬆ 0    
+2021-12-29 10:21:06 🎤 Proposing song lyric to a block.    
+2021-12-29 10:21:06 🙌 Starting consensus session on top of parent 0x3038681a906e24c5070c4763027cacbd2438388d89378898ef07632db99ac79a    
+2021-12-29 10:21:06 🎤 Storing song verse in storage: Simply nothing more to give    
+2021-12-29 10:21:06 🎁 Prepared block for proposing at 6 (0 ms) [hash: 0x656d9dedec7defc7ad4ba207c2344c939f063f2e4fc306d52364d33899a4a3c8; parent_hash: 0x3038…c79a; extrinsics (2): [0x7999…567e, 0xa2d7…bd8a]]    
+2021-12-29 10:21:06 🔖 Pre-sealed block for proposal at 6. Hash now 0x36dcc9fe0966ea2e2f4d5b0749547927648baed0fea57e9ab84578b6eeb7d48e, previously 0x656d9dedec7defc7ad4ba207c2344c939f063f2e4fc306d52364d33899a4a3c8.    
+2021-12-29 10:21:06 ✨ Imported #6 (0x36dc…d48e)    
+2021-12-29 10:21:08 💤 Idle (0 peers), best: #6 (0x36dc…d48e), finalized #4 (0xa079…029b), ⬇ 0 ⬆ 0    
+2021-12-29 10:21:12 🎤 Proposing song lyric to a block.    
+2021-12-29 10:21:12 🙌 Starting consensus session on top of parent 0x36dcc9fe0966ea2e2f4d5b0749547927648baed0fea57e9ab84578b6eeb7d48e    
+2021-12-29 10:21:12 🎤 Storing song verse in storage: There is nothing more for me    
+2021-12-29 10:21:12 🎁 Prepared block for proposing at 7 (0 ms) [hash: 0x24c102d095dc57becd49b4b0cce9603d9c591ea454f0ddfa53b0d6248f1cddcb; parent_hash: 0x36dc…d48e; extrinsics (2): [0xa299…bd98, 0x9634…c3a0]]    
+2021-12-29 10:21:12 🔖 Pre-sealed block for proposal at 7. Hash now 0x88d35fda64ebe7f84eeae46beadf1b742f6b2ed88f30e562a2fc71c9a6781cab, previously 0x24c102d095dc57becd49b4b0cce9603d9c591ea454f0ddfa53b0d6248f1cddcb.    
+2021-12-29 10:21:12 ✨ Imported #7 (0x88d3…1cab)    
+2021-12-29 10:21:14 💤 Idle (0 peers), best: #7 (0x88d3…1cab), finalized #5 (0x3038…c79a), ⬇ 0 ⬆ 0    
+2021-12-29 10:21:18 🎤 Proposing song lyric to a block.    
+2021-12-29 10:21:18 🙌 Starting consensus session on top of parent 0x88d35fda64ebe7f84eeae46beadf1b742f6b2ed88f30e562a2fc71c9a6781cab    
+2021-12-29 10:21:18 🎤 Storing song verse in storage: Need the end to set me free    
+2021-12-29 10:21:18 🎁 Prepared block for proposing at 8 (0 ms) [hash: 0xd37eca06b79074e2b7ece09458e39b7e8749c56039d372f791c1db1d217c1362; parent_hash: 0x88d3…1cab; extrinsics (2): [0x7085…b2a9, 0x9690…7099]]    
+2021-12-29 10:21:18 🔖 Pre-sealed block for proposal at 8. Hash now 0x186889a21da6cb3566f885868a6f1da58d3ecd6781d2f75a9299bba6c521b3c4, previously 0xd37eca06b79074e2b7ece09458e39b7e8749c56039d372f791c1db1d217c1362.    
+2021-12-29 10:21:18 ✨ Imported #8 (0x1868…b3c4)    
+2021-12-29 10:21:19 💤 Idle (0 peers), best: #8 (0x1868…b3c4), finalized #5 (0x3038…c79a), ⬇ 0 ⬆ 0    
+2021-12-29 10:21:24 🎤 Proposing song lyric to a block.    
+2021-12-29 10:21:24 💤 Idle (0 peers), best: #8 (0x1868…b3c4), finalized #6 (0x36dc…d48e), ⬇ 0 ⬆ 0    
+2021-12-29 10:21:24 🙌 Starting consensus session on top of parent 0x186889a21da6cb3566f885868a6f1da58d3ecd6781d2f75a9299bba6c521b3c4    
+2021-12-29 10:21:24 🎤 Storing song verse in storage: Life, it seems, will fade away    
+2021-12-29 10:21:24 🎁 Prepared block for proposing at 9 (0 ms) [hash: 0x24244340f31fc0ad2d2ab3d363ee12e280953452feab5632c9f98acaca9fa036; parent_hash: 0x1868…b3c4; extrinsics (2): [0xf112…6584, 0xd305…042b]]    
+2021-12-29 10:21:24 🔖 Pre-sealed block for proposal at 9. Hash now 0xc29ed97454cd6f2491f5acc32a649de533096164a841a67b09b0330894b5d0ac, previously 0x24244340f31fc0ad2d2ab3d363ee12e280953452feab5632c9f98acaca9fa036.    
+2021-12-29 10:21:24 ✨ Imported #9 (0xc29e…d0ac)    
+2021-12-29 10:21:29 💤 Idle (0 peers), best: #9 (0xc29e…d0ac), finalized #7 (0x88d3…1cab), ⬇ 0 ⬆ 0    
+2021-12-29 10:21:30 🎤 Proposing song lyric to a block.    
+

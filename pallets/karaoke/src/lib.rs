@@ -2,12 +2,6 @@
 
 pub use pallet::*;
 
-#[cfg(test)]
-mod mock;
-
-#[cfg(test)]
-mod tests;
-
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::pallet_prelude::*;
@@ -16,6 +10,7 @@ pub mod pallet {
 	use sp_inherents;
 	use sp_runtime;
 	use log::info;
+	use sp_std::str;
 
 	type SongLine = Vec<u8>;
 
@@ -78,16 +73,16 @@ pub mod pallet {
 		const INHERENT_IDENTIFIER: InherentIdentifier = INHERENT_IDENTIFIER;
 
 		fn create_inherent(data: &InherentData) -> Option<Self::Call> {
-			let inherent_data = data
+			let verse = data
 				.get_data::<SongLine>(&INHERENT_IDENTIFIER)
 				.expect("Song lyrics inherent data not correctly encoded")
 				.expect("Song lyrics must be provided");
-			info!("🐟 Creating inherent data: {:?}", inherent_data);
-			Some(Call::store_lyrics { song_line: inherent_data } )
+			info!("🎤 Storing song verse in storage: {}", str::from_utf8(&verse).unwrap());
+			Some(Call::store_lyrics { song_line: verse } )
 		}
 
 		fn is_inherent(call: &Self::Call) -> bool {
-			info!("🐁 Checking if call {:?} is inherent", call);
+			info!("🎤 Checking if call {:?} is inherent", call);
 			matches!(call, Call::store_lyrics { .. })
 		}
 	}
