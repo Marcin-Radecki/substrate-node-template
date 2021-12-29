@@ -1,6 +1,9 @@
 //! `CasinoGossip`: a broadcasting engine for messages when blocks are imported by Substrate
 //!
-//! Inspired by [GRANDPA finality gadget code](https://github.com/paritytech/substrate/blob/master/client/finality-grandpa/src/lib.rs)
+//! Inspired by
+//! - grandpa gadget crate [https://github.com/paritytech/substrate/tree/master/client/finality-grandpa/src/communication](https://github.com/paritytech/substrate/tree/master/client/finality-grandpa/src/communication)
+//! - `network-gossip` [https://github.com/paritytech/substrate/tree/master/client/network-gossip](https://github.com/paritytech/substrate/tree/master/client/network-gossip),
+//! - [https://github.com/paritytech/substrate/blob/master/client/consensus/common/src/block_import.rs](https://github.com/paritytech/substrate/blob/master/client/consensus/common/src/block_import.rs)
 
 use std::collections::HashMap;
 use std::marker::PhantomData;
@@ -16,26 +19,20 @@ pub const CASINO_PROTOCOL_NAME: &'static str = "casino/1";
 
 pub const CASINO_TOPIC: &'static str = "casino-topic";
 
+pub type TypeSentFromBlockImporter<Block> = (sp_timestamp::Timestamp, sp_runtime::traits::NumberFor::<Block>);
+
 /// Block importer specific for gossiping timestamp
 pub struct CasinoBlockImporter<Block: sp_runtime::traits::Block, Client, InnerBlockImport> {
     block_import: InnerBlockImport,
-    gossip_block_number_threshold: u64,
-    gossip_next_block_number: u64,
-    first_timestamp: Option<sp_timestamp::Timestamp>,
-    timestamp_sender: sc_utils::mpsc::TracingUnboundedSender<sp_timestamp::Timestamp>,
-    _phantom: PhantomData<(Block, Client)>,
+    timestamp_sender: sc_utils::mpsc::TracingUnboundedSender<TypeSentFromBlockImporter<Block>>,
+    _phantom: PhantomData<Client>,
 }
 
 impl<Block: sp_runtime::traits::Block, Client, InnerBlockImport> CasinoBlockImporter<Block, Client, InnerBlockImport> {
     pub fn new(block_import: InnerBlockImport,
-               gossip_block_number_threshold: u64,
-               gossip_next_block_number: u64,
-               timestamp_sender: sc_utils::mpsc::TracingUnboundedSender<sp_timestamp::Timestamp>) -> Self {
+               timestamp_sender: sc_utils::mpsc::TracingUnboundedSender<TypeSentFromBlockImporter<Block>>) -> Self {
         Self {
             block_import,
-            gossip_block_number_threshold,
-            gossip_next_block_number,
-            first_timestamp: None,
             timestamp_sender,
             _phantom: Default::default(),
         }
@@ -47,9 +44,6 @@ impl<Block: sp_runtime::traits::Block, Client, InnerBlockImport: Clone> Clone fo
     fn clone(&self) -> Self {
         Self {
             block_import: self.block_import.clone(),
-            gossip_block_number_threshold: self.gossip_block_number_threshold,
-            gossip_next_block_number: self.gossip_next_block_number,
-            first_timestamp: self.first_timestamp.clone(),
             timestamp_sender: self.timestamp_sender.clone(),
             _phantom: Default::default(),
         }
@@ -76,21 +70,10 @@ impl<Block, Client, InnerBlockImport> sc_consensus::BlockImport<Block> for Casin
         block: sc_consensus::BlockImportParams<Block, Self::Transaction>,
         new_cache: HashMap<sp_blockchain::well_known_cache_keys::Id, Vec<u8>>,
     ) -> Result<sc_consensus::ImportResult, Self::Error> {
-        let number = *block.header.number();
+        let block_number = *block.header.number();
         let timestamp = sp_timestamp::InherentDataProvider::from_system_time().timestamp();
-        log::debug!("🎰 Importing block {}, block hash {}, timestamp: {}", number, block.header.hash(), u64_timestamp_to_string(*timestamp));
-
-        let number_parsed = sp_runtime::traits::NumberFor::<Block>::from(self.gossip_block_number_threshold as u32);
-        if number.eq(&number_parsed) {
-            self.first_timestamp = Some(timestamp);
-        } else if self.first_timestamp.is_some() {
-            let current_timestamp = *self.first_timestamp.unwrap();
-            let diff = *timestamp - current_timestamp;
-            let predicted_timestamp = current_timestamp + self.gossip_next_block_number * diff;
-            log::info!("🎰 Sending timestamp {} from block importer", u64_timestamp_to_string(predicted_timestamp));
-            self.timestamp_sender.unbounded_send(sp_timestamp::Timestamp::new(predicted_timestamp)).expect("Failed to send a timestamp!");
-            self.first_timestamp = None;
-        }
+        log::debug!("🎰 Importing block {}, block hash {}, timestamp: {} UTC", block_number, block.header.hash(), u64_timestamp_to_string(*timestamp));
+        self.timestamp_sender.unbounded_send((timestamp, block_number)).expect("Failed to send current block timestamp and number!");
         self.block_import.import_block(block, new_cache).await.map_err(Into::into)
     }
 }
@@ -121,9 +104,17 @@ impl<Block: sp_runtime::traits::Block> sc_network_gossip::Validator<Block> for F
     }
 }
 
+/// Wrapper over Grandpa finality gadget GossipEngine, with additional logic to gossip timestamp
+/// of Nth + Krh block after Nth + 1 block is imported.
+/// The reason gossiping engine logic is placed here and not in block importer (besides more correct
+/// from code design pov) is that `CasinoGossipEngine` is not cloned whereas `CasinoBlockImporter`
+/// might be, so any `CasinoBlockImporter` field write access needs to be synchronized among threads.
 pub struct CasinoGossipEngine<Block: sp_runtime::traits::Block, Network: sc_network_gossip::Network<Block>> {
     gossip_engine: Arc<Mutex<sc_network_gossip::GossipEngine<Block>>>,
-    timestamp_receiver: sc_utils::mpsc::TracingUnboundedReceiver<sp_timestamp::Timestamp>,
+    timestamp_and_block_number_receiver: sc_utils::mpsc::TracingUnboundedReceiver<TypeSentFromBlockImporter<Block>>,
+    gossip_block_number_threshold: u64,
+    gossip_next_block_number: u64,
+    previous_block_timestamp: u64,
     _phantom: PhantomData<Network>,
 }
 
@@ -133,7 +124,9 @@ impl<Block, Network> CasinoGossipEngine<Block, Network>
         Network: sc_network_gossip::Network<Block> + Clone + Send + 'static,
 {
     pub fn new(network_service: Network,
-               timestamp_receiver: sc_utils::mpsc::TracingUnboundedReceiver<sp_timestamp::Timestamp>) -> Self {
+               timestamp_and_block_number_receiver: sc_utils::mpsc::TracingUnboundedReceiver<TypeSentFromBlockImporter<Block>>,
+               gossip_block_number_threshold: u64,
+               gossip_next_block_number: u64) -> Self {
         let validator = Arc::new(ForwardAllValidator {});
         let gossip_engine = Arc::new(Mutex::new(sc_network_gossip::GossipEngine::new(
             network_service.clone(),
@@ -144,8 +137,31 @@ impl<Block, Network> CasinoGossipEngine<Block, Network>
 
         Self {
             gossip_engine,
-            timestamp_receiver,
+            timestamp_and_block_number_receiver,
+            gossip_block_number_threshold,
+            gossip_next_block_number,
+            previous_block_timestamp: 0,
             _phantom: Default::default(),
+        }
+    }
+
+    fn check_send_timestamp_gossip(&mut self, timestamp_and_block_number: TypeSentFromBlockImporter<Block>) {
+        let (timestamp, block_number) = timestamp_and_block_number;
+        log::info!("🎰 Received timestamp {} and block number {} from block importer.", u64_timestamp_to_string(*timestamp), &block_number);
+        let block_number_threshold = sp_runtime::traits::NumberFor::<Block>::from(self.gossip_block_number_threshold as u32);
+        if block_number.eq(&block_number_threshold) {
+            log::debug!("🎰 Saving previous block timestamp {} UTC", u64_timestamp_to_string(*timestamp));
+            self.previous_block_timestamp = *timestamp;
+        } else if self.previous_block_timestamp != 0 {
+            let diff = *timestamp - self.previous_block_timestamp;
+            let predicted_timestamp = self.previous_block_timestamp + self.gossip_next_block_number * diff;
+            log::info!("🎰 Timestamp of block {}th to arrive: {} UTC", self.gossip_block_number_threshold + self.gossip_next_block_number, u64_timestamp_to_string(predicted_timestamp));
+            log::debug!("🎰 Diff between previous block: {}", u64_timestamp_to_string(diff));
+            self.gossip_engine.lock().unwrap().gossip_message(
+                casino_topic::<Block>(),
+                Vec::from(predicted_timestamp.to_be_bytes()),
+                false);
+            self.previous_block_timestamp = 0;
         }
     }
 }
@@ -178,17 +194,11 @@ impl<Block, Network> std::future::Future for CasinoGossipEngine<Block, Network>
 
         loop {
             log::debug!("🎰 Polling CasinoGossipEngine future.");
-            match self.timestamp_receiver.poll_next_unpin(cx) {
-                Poll::Ready(Some(timestamp)) => {
-                    log::info!("🎰 Received timestamp {} from block importer. Sending to gossip engine.", u64_timestamp_to_string(*timestamp));
-                    self.gossip_engine.lock().unwrap().gossip_message(
-                        casino_topic::<Block>(),
-                        Vec::from(timestamp.to_be_bytes()),
-                        false);
-                }
-                Poll::Ready(None) => {
-                    return Poll::Ready(Err(CasinoError(String::from("Gossip validator report stream closed."))));
-                }
+            match self.timestamp_and_block_number_receiver.poll_next_unpin(cx) {
+                Poll::Ready(Some(timestamp_and_block_number)) =>
+                    self.check_send_timestamp_gossip(timestamp_and_block_number),
+                Poll::Ready(None) =>
+                    return Poll::Ready(Err(CasinoError(String::from("Gossip validator report stream closed.")))),
                 Poll::Pending => break,
             }
         }
@@ -203,7 +213,7 @@ impl<Block, Network> std::future::Future for CasinoGossipEngine<Block, Network>
                 Poll::Ready(Some(notification)) => {
                     let a: [u8; 8] = notification.message.clone().try_into().unwrap();
                     let timestamp = u64::from_be_bytes(a);
-                    log::info!("🎰 Received timestamp via gossip engine {}", u64_timestamp_to_string(timestamp));
+                    log::info!("🎰 Received timestamp via gossip engine {} UTC", u64_timestamp_to_string(timestamp));
                 }
                 Poll::Ready(None) => {
                     return Poll::Ready(Err(CasinoError(String::from("Gossip engine stream closed."))));
@@ -216,14 +226,14 @@ impl<Block, Network> std::future::Future for CasinoGossipEngine<Block, Network>
     }
 }
 
-pub fn run_casino_gossiper<Block, Network>(rx: sc_utils::mpsc::TracingUnboundedReceiver<sp_timestamp::Timestamp>,
+pub fn run_casino_gossiper<Block, Network>(rx: sc_utils::mpsc::TracingUnboundedReceiver<TypeSentFromBlockImporter<Block>>,
                                            network_service: Network)
                                            -> sp_blockchain::Result<impl std::future::Future<Output=()> + Send>
     where
         Block: sp_runtime::traits::Block,
         Network: sc_network_gossip::Network<Block> + Clone + Send + 'static,
 {
-    let engine = CasinoGossipEngine::new(network_service, rx);
+    let engine = CasinoGossipEngine::new(network_service, rx, 3, 5);
     let engine = engine.map(|res| match res {
         Ok(()) => log::error!("Casino gossiper future has concluded naturally, this should be unreachable."),
         Err(e) => log::error!("Casino gossiper error: {:?}", e.0),
